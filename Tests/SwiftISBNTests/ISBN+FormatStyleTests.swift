@@ -11,8 +11,8 @@ import ISBN
 
 struct ISBNFormatStyleTests {
     @Test
-    func formatStyleProducesHyphenSeparatedISBN() {
-        let isbn = ISBN(
+    func formatStyleProducesHyphenSeparatedISBN() throws {
+        let isbn = try ISBN(
             prefixElement: "978",
             registrationGroupElement: "4",
             registrantElement: "87311",
@@ -26,8 +26,8 @@ struct ISBNFormatStyleTests {
     }
 
     @Test
-    func formattedHelperUsesISBNFormatStyle() {
-        let isbn = ISBN(
+    func formattedHelperUsesISBNFormatStyle() throws {
+        let isbn = try ISBN(
             prefixElement: "979",
             registrationGroupElement: "10",
             registrantElement: "12345",
@@ -39,19 +39,23 @@ struct ISBNFormatStyleTests {
 
         #expect(formatted == "979-10-12345-678-9")
     }
-    
+
     @Test
-    func xx() async throws {
-        let isbn = ISBN(
-            prefixElement: "",
-            registrationGroupElement: "0",
-            registrantElement: "12345",
-            publicationElement: "678",
-            checkDigit: "9"
-        )
-        
-        let formatted = isbn.formatted(.isbn)
-        
-        #expect(formatted == "0-12345-678-9")
+    func initThrowsWhenPrefixElementIsInvalid() {
+        do {
+            _ = try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "0",
+                registrantElement: "12345",
+                publicationElement: "678",
+                checkDigit: "9"
+            )
+
+            Issue.record("Expected invalid prefixElement to throw")
+        } catch let error as ISBN.ValidationError {
+            #expect(error == .invalidPrefixElement(""))
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+        }
     }
 }
