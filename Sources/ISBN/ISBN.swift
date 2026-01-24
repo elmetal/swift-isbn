@@ -9,6 +9,8 @@
 public struct ISBN {
     public enum ValidationError: Error, Equatable {
         case invalidPrefixElement(String)
+        case invalidTotalDigitCount(Int)
+        case invalidCheckDigit(String)
     }
 
     public let prefixElement: String
@@ -18,6 +20,7 @@ public struct ISBN {
     public let checkDigit: String
 
     private static let validPrefixElements: Set<String> = ["978", "979"]
+    private static let expectedTotalDigitCount = 13
 
     public init(
         prefixElement: String,
@@ -28,6 +31,19 @@ public struct ISBN {
     ) throws {
         guard Self.validPrefixElements.contains(prefixElement) else {
             throw ValidationError.invalidPrefixElement(prefixElement)
+        }
+
+        guard checkDigit.count == 1 else {
+            throw ValidationError.invalidCheckDigit(checkDigit)
+        }
+
+        let totalDigitCount = prefixElement.count
+            + registrationGroupElement.count
+            + registrantElement.count
+            + publicationElement.count
+            + checkDigit.count
+        guard totalDigitCount == Self.expectedTotalDigitCount else {
+            throw ValidationError.invalidTotalDigitCount(totalDigitCount)
         }
 
         self.prefixElement = prefixElement
