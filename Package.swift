@@ -8,19 +8,19 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "swift-isbn",
-            targets: ["swift-isbn"]
+            name: "ISBN",
+            targets: ["ISBN"]
         ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "swift-isbn"
+            name: "ISBN"
         ),
         .testTarget(
-            name: "swift-isbnTests",
-            dependencies: ["swift-isbn"]
+            name: "SwiftISBNTests",
+            dependencies: ["ISBN"]
         ),
     ]
 )
