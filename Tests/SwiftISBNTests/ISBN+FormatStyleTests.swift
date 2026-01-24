@@ -17,12 +17,12 @@ struct ISBNFormatStyleTests {
             registrationGroupElement: "4",
             registrantElement: "87311",
             publicationElement: "593",
-            checkDigit: "6"
+            checkDigit: "1"
         )
 
         let formatted = ISBN.FormatStyle.isbn.format(isbn)
 
-        #expect(formatted == "978-4-87311-593-6")
+        #expect(formatted == "978-4-87311-593-1")
     }
 
     @Test
@@ -32,12 +32,12 @@ struct ISBNFormatStyleTests {
             registrationGroupElement: "10",
             registrantElement: "1234",
             publicationElement: "567",
-            checkDigit: "9"
+            checkDigit: "8"
         )
 
         let formatted = isbn.formatted(.isbn)
 
-        #expect(formatted == "979-10-1234-567-9")
+        #expect(formatted == "979-10-1234-567-8")
     }
 
     @Test
@@ -92,6 +92,25 @@ struct ISBNFormatStyleTests {
             Issue.record("Expected invalid checkDigit to throw")
         } catch let error as ISBN.ValidationError {
             #expect(error == .invalidCheckDigit("67"))
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+        }
+    }
+
+    @Test
+    func initThrowsWhenCheckDigitDoesNotMatchRule() {
+        do {
+            _ = try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "87311",
+                publicationElement: "593",
+                checkDigit: "6"
+            )
+
+            Issue.record("Expected invalid checkDigit rule to throw")
+        } catch let error as ISBN.ValidationError {
+            #expect(error == .invalidCheckDigit("6"))
         } catch {
             Issue.record("Unexpected error: \(error)")
         }

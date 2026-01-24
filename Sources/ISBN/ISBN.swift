@@ -46,10 +46,43 @@ public struct ISBN {
             throw ValidationError.invalidTotalDigitCount(totalDigitCount)
         }
 
+        let digitsWithoutCheckDigit = prefixElement
+            + registrationGroupElement
+            + registrantElement
+            + publicationElement
+        guard let expectedCheckDigit = Self.expectedCheckDigit(for: digitsWithoutCheckDigit) else {
+            throw ValidationError.invalidCheckDigit(checkDigit)
+        }
+
+        guard checkDigit == expectedCheckDigit else {
+            throw ValidationError.invalidCheckDigit(checkDigit)
+        }
+
         self.prefixElement = prefixElement
         self.registrationGroupElement = registrationGroupElement
         self.registrantElement = registrantElement
         self.publicationElement = publicationElement
         self.checkDigit = checkDigit
+    }
+}
+
+private extension ISBN {
+    static func expectedCheckDigit(for digitsWithoutCheckDigit: String) -> String? {
+        guard digitsWithoutCheckDigit.count == expectedTotalDigitCount - 1 else {
+            return nil
+        }
+
+        var sum = 0
+        for (index, character) in digitsWithoutCheckDigit.enumerated() {
+            guard let digit = character.wholeNumberValue else {
+                return nil
+            }
+
+            let weight = index.isMultiple(of: 2) ? 1 : 3
+            sum += digit * weight
+        }
+
+        let checkDigitValue = (10 - (sum % 10)) % 10
+        return String(checkDigitValue)
     }
 }
