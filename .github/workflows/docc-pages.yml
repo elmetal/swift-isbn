@@ -25,7 +25,7 @@ jobs:
       - name: Build DocC archive
         run: |
           xcodebuild docbuild \
-            -scheme ISBN \
+            -target ISBN \
             -destination 'platform=macOS'
 
       - name: Convert DocC archive for static hosting
