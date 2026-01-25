@@ -8,5 +8,7 @@
 import Testing
 
 extension Tag {
+    @Tag static var isbn10: Tag
+    @Tag static var isbn13: Tag
     @Tag static var validation: Tag
 }
