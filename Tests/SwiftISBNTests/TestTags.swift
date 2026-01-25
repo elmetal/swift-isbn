@@ -8,5 +8,5 @@
 import Testing
 
 extension Tag {
-    @Tag static var validation
+    @Tag static var validation: Tag
 }
