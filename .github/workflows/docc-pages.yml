@@ -32,7 +32,7 @@ jobs:
         run: |
           DOCCARCHIVE=$(find ~/Library/Developer/Xcode/DerivedData -type d -name 'ISBN.doccarchive' | head -n 1)
           if [[ -z "${DOCCARCHIVE}" ]]; then
-            echo "DocC archive not found."
+            echo "Error: ISBN.doccarchive not found under ~/Library/Developer/Xcode/DerivedData. Verify that the 'xcodebuild docbuild' step completed successfully and that the ISBN scheme produces a DocC archive."
             exit 1
           fi
           xcrun docc convert "${DOCCARCHIVE}" \
