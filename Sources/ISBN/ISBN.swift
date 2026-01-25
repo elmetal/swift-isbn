@@ -6,10 +6,29 @@
 //
 //
 
+/// A value that represents a validated ISBN-10 or ISBN-13.
+///
+/// Create an ``ISBN`` by providing each element of the ISBN. The initializer
+/// validates the digits and check digit, then normalizes the stored elements
+/// based on whether the value is ISBN-10 or ISBN-13.
+///
+/// ```swift
+/// let isbn = try ISBN(
+///     prefixElement: "978",
+///     registrationGroupElement: "4",
+///     registrantElement: "1234",
+///     publicationElement: "5678",
+///     checkDigit: "9"
+/// )
+/// ```
 public struct ISBN {
+    /// Validation failures that can occur while initializing an ``ISBN``.
     public enum ValidationError: Error, Equatable {
+        /// The prefix element is not a valid ISBN-13 prefix.
         case invalidPrefixElement(String)
+        /// The overall digit count does not match ISBN-10 or ISBN-13.
         case invalidTotalDigitCount(Int)
+        /// The check digit is invalid for the provided digits.
         case invalidCheckDigit(String)
     }
 
@@ -18,12 +37,27 @@ public struct ISBN {
         case isbn10(ISBN10)
     }
 
+    /// The ISBN prefix element, or an empty string for ISBN-10.
     public let prefixElement: String
+    /// The registration group element.
     public let registrationGroupElement: String
+    /// The registrant element.
     public let registrantElement: String
+    /// The publication element.
     public let publicationElement: String
+    /// The check digit.
     public let checkDigit: String
 
+    /// Creates a validated ISBN value from its components.
+    ///
+    /// - Parameters:
+    ///   - prefixElement: The ISBN-13 prefix. Pass an empty string for ISBN-10.
+    ///   - registrationGroupElement: The registration group element.
+    ///   - registrantElement: The registrant element.
+    ///   - publicationElement: The publication element.
+    ///   - checkDigit: The check digit.
+    /// - Throws: ``ISBN/ValidationError`` when the digits are invalid or the
+    ///   check digit does not match.
     public init(
         prefixElement: String,
         registrationGroupElement: String,
