@@ -39,4 +39,19 @@ struct ISBNFormatStyleTests {
 
         #expect(formatted == "979-10-1234-567-8")
     }
+
+    @Test
+    func formatStyleOmitsEmptyPrefixElement() throws {
+        let isbn = try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "0",
+            registrantElement: "306",
+            publicationElement: "40615",
+            checkDigit: "2"
+        )
+
+        let formatted = isbn.formatted(.isbn)
+
+        #expect(formatted == "0-306-40615-2")
+    }
 }
