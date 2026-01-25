@@ -10,7 +10,7 @@ import Testing
 import ISBN
 
 struct ISBNTests {
-    @Test
+    @Test(.tags(.validation))
     func initThrowsWhenPrefixElementIsInvalid() {
         do {
             _ = try ISBN(
@@ -29,7 +29,7 @@ struct ISBNTests {
         }
     }
 
-    @Test
+    @Test(.tags(.validation))
     func initThrowsWhenTotalDigitCountIsNot13() {
         do {
             _ = try ISBN(
@@ -48,7 +48,7 @@ struct ISBNTests {
         }
     }
 
-    @Test
+    @Test(.tags(.validation))
     func initThrowsWhenCheckDigitIsNotSingleDigit() {
         do {
             _ = try ISBN(
@@ -67,7 +67,7 @@ struct ISBNTests {
         }
     }
 
-    @Test
+    @Test(.tags(.validation))
     func initThrowsWhenCheckDigitDoesNotMatchRule() {
         do {
             _ = try ISBN(
