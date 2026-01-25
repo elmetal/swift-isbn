@@ -85,4 +85,15 @@ struct ISBNTests {
             Issue.record("Unexpected error: \(error)")
         }
     }
+
+    @Test(.tags(.validation, .isbn10))
+    func initAcceptsISBN10WhenPrefixElementIsEmpty() throws {
+        _ = try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "0",
+            registrantElement: "306",
+            publicationElement: "40615",
+            checkDigit: "2"
+        )
+    }
 }
