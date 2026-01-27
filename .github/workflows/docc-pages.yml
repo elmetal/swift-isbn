@@ -27,18 +27,12 @@ jobs:
           xcodebuild docbuild \
             -scheme swift-isbn \
             -destination 'platform=macOS'
+            -derivedDataPath DerivedData
 
-      - name: Convert DocC archive for static hosting
-        run: |
-          DOCCARCHIVE=$(find ~/Library/Developer/Xcode/DerivedData -type d -name 'ISBN.doccarchive' | head -n 1)
-          if [[ -z "${DOCCARCHIVE}" ]]; then
-            echo "Error: ISBN.doccarchive not found under ~/Library/Developer/Xcode/DerivedData. Verify that the 'xcodebuild docbuild' step completed successfully and that the ISBN scheme produces a DocC archive."
-            exit 1
-          fi
-          xcrun docc convert "${DOCCARCHIVE}" \
-            --output-path "docs" \
-            --transform-for-static-hosting \
-            --hosting-base-path "${{ github.event.repository.name }}"
+          $(xcrun --find docc) process-archive \
+             transform-for-static-hosting DerivedData/Build/Products/Debug-*/ISBN.doccarchive \
+             --output-path ./docs \
+             --hosting-base-path "ISBN"
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
