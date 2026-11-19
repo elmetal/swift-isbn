@@ -31,7 +31,7 @@ struct ISBN13 {
             throw ISBN.ValidationError.invalidCheckDigit(checkDigit)
         }
 
-        try ISBN.validateDigitsOnly(
+        try ISBN.validateElements(
             registrationGroupElement,
             registrantElement,
             publicationElement

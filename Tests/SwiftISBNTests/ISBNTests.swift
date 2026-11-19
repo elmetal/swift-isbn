@@ -186,6 +186,58 @@ struct ISBNTests {
         )
     }
 
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13RegistrationGroupElementIsEmpty() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "",
+                registrantElement: "487311",
+                publicationElement: "593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13RegistrantElementIsEmpty() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "",
+                publicationElement: "87311593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenISBN10PublicationElementIsEmpty() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "0",
+                registrantElement: "30640615",
+                publicationElement: "",
+                checkDigit: "2"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initReportsEmptyElementBeforeTotalDigitCount() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "",
+                registrantElement: "87311",
+                publicationElement: "593",
+                checkDigit: "1"
+            )
+        }
+    }
+
     @Test
     func isbnsWithSameElementsAreEqualAndHashEqually() throws {
         let lhs = try Self.makeISBN13()
