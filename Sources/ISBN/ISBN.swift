@@ -32,11 +32,6 @@ public struct ISBN {
         case invalidCheckDigit(String)
     }
 
-    private enum InternalISBN {
-        case isbn13(ISBN13)
-        case isbn10(ISBN10)
-    }
-
     /// The ISBN prefix element, or an empty string for ISBN-10.
     public let prefixElement: String
     /// The registration group element.
@@ -65,41 +60,31 @@ public struct ISBN {
         publicationElement: String,
         checkDigit: String
     ) throws {
-        let internalISBN: InternalISBN
         if prefixElement.isEmpty {
-            internalISBN = .isbn10(
-                try ISBN10(
-                    registrationGroupElement: registrationGroupElement,
-                    registrantElement: registrantElement,
-                    publicationElement: publicationElement,
-                    checkDigit: checkDigit
-                )
+            let isbn10 = try ISBN10(
+                registrationGroupElement: registrationGroupElement,
+                registrantElement: registrantElement,
+                publicationElement: publicationElement,
+                checkDigit: checkDigit
             )
-        } else {
-            internalISBN = .isbn13(
-                try ISBN13(
-                    prefixElement: prefixElement,
-                    registrationGroupElement: registrationGroupElement,
-                    registrantElement: registrantElement,
-                    publicationElement: publicationElement,
-                    checkDigit: checkDigit
-                )
-            )
-        }
-
-        switch internalISBN {
-        case .isbn13(let isbn13):
-            self.prefixElement = isbn13.prefixElement
-            self.registrationGroupElement = isbn13.registrationGroupElement
-            self.registrantElement = isbn13.registrantElement
-            self.publicationElement = isbn13.publicationElement
-            self.checkDigit = isbn13.checkDigit
-        case .isbn10(let isbn10):
             self.prefixElement = isbn10.prefixElement
             self.registrationGroupElement = isbn10.registrationGroupElement
             self.registrantElement = isbn10.registrantElement
             self.publicationElement = isbn10.publicationElement
             self.checkDigit = isbn10.checkDigit
+        } else {
+            let isbn13 = try ISBN13(
+                prefixElement: prefixElement,
+                registrationGroupElement: registrationGroupElement,
+                registrantElement: registrantElement,
+                publicationElement: publicationElement,
+                checkDigit: checkDigit
+            )
+            self.prefixElement = isbn13.prefixElement
+            self.registrationGroupElement = isbn13.registrationGroupElement
+            self.registrantElement = isbn13.registrantElement
+            self.publicationElement = isbn13.publicationElement
+            self.checkDigit = isbn13.checkDigit
         }
     }
 }
