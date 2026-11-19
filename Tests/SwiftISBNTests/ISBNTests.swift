@@ -122,4 +122,60 @@ struct ISBNTests {
             )
         }
     }
+
+    @Test
+    func isbnsWithSameElementsAreEqualAndHashEqually() throws {
+        let lhs = try Self.makeISBN13()
+        let rhs = try Self.makeISBN13()
+
+        #expect(lhs == rhs)
+        #expect(lhs.hashValue == rhs.hashValue)
+    }
+
+    @Test
+    func isbnsWithDifferentElementsAreNotEqual() throws {
+        let isbn13 = try Self.makeISBN13()
+        let isbn10 = try Self.makeISBN10()
+
+        #expect(isbn13 != isbn10)
+    }
+
+    @Test
+    func isbnCanBeUsedAsSetElement() throws {
+        let isbns: Set<ISBN> = [
+            try Self.makeISBN13(),
+            try Self.makeISBN13(),
+            try Self.makeISBN10()
+        ]
+
+        #expect(isbns.count == 2)
+    }
+
+    @Test
+    func isbnIsSendable() throws {
+        // Fails to compile if `ISBN` stops being `Sendable`.
+        let isbn: any Sendable = try Self.makeISBN13()
+
+        #expect(isbn is ISBN)
+    }
+
+    private static func makeISBN13() throws -> ISBN {
+        try ISBN(
+            prefixElement: "978",
+            registrationGroupElement: "4",
+            registrantElement: "87311",
+            publicationElement: "593",
+            checkDigit: "1"
+        )
+    }
+
+    private static func makeISBN10() throws -> ISBN {
+        try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "0",
+            registrantElement: "306",
+            publicationElement: "40615",
+            checkDigit: "2"
+        )
+    }
 }

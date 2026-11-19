@@ -21,7 +21,10 @@
 ///     checkDigit: "1"
 /// )
 /// ```
-public struct ISBN {
+///
+/// Two ``ISBN`` values are equal when all of their elements are equal. An
+/// ISBN-10 and the ISBN-13 of the same publication are therefore not equal.
+public struct ISBN: Equatable, Hashable, Sendable {
     /// Validation failures that can occur while initializing an ``ISBN``.
     public enum ValidationError: Error, Equatable {
         /// The prefix element is not a valid ISBN-13 prefix.
