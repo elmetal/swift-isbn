@@ -32,9 +32,9 @@ struct ISBN13 {
         }
 
         try ISBN.validateElements(
-            registrationGroupElement,
-            registrantElement,
-            publicationElement
+            registrationGroupElement: registrationGroupElement,
+            registrantElement: registrantElement,
+            publicationElement: publicationElement
         )
 
         let totalDigitCount = prefixElement.count

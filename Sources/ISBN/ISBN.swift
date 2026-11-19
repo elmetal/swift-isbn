@@ -32,6 +32,10 @@ public struct ISBN: Equatable, Hashable, Sendable {
         /// The registration group, registrant, or publication element is empty.
         /// Each of them consists of at least one digit.
         case emptyElement
+        /// The registration group, registrant, or publication element has more
+        /// digits than an ISBN allows: 5, 7, and 6 respectively. The associated
+        /// value is the offending element.
+        case elementTooLong(String)
         /// The registration group, registrant, or publication element contains
         /// a character other than the ASCII digits 0–9. The associated value is
         /// the offending element.
@@ -102,16 +106,30 @@ public struct ISBN: Equatable, Hashable, Sendable {
 extension ISBN {
     /// Validates the registration group, registrant, and publication elements.
     ///
-    /// Throws ``ValidationError/emptyElement`` for an empty element and
+    /// Throws ``ValidationError/emptyElement`` for an empty element,
     /// ``ValidationError/invalidCharacters(_:)`` for one that contains anything
-    /// other than the ASCII digits 0–9, reporting the first problem found.
-    static func validateElements(_ elements: String...) throws {
+    /// other than the ASCII digits 0–9, and ``ValidationError/elementTooLong(_:)``
+    /// for one with more digits than an ISBN allows, reporting the first
+    /// problem found.
+    static func validateElements(
+        registrationGroupElement: String,
+        registrantElement: String,
+        publicationElement: String
+    ) throws {
+        let elements = [
+            (value: registrationGroupElement, maximumDigitCount: 5),
+            (value: registrantElement, maximumDigitCount: 7),
+            (value: publicationElement, maximumDigitCount: 6)
+        ]
         for element in elements {
-            guard !element.isEmpty else {
+            guard !element.value.isEmpty else {
                 throw ValidationError.emptyElement
             }
-            guard element.allSatisfy({ $0.isASCII && $0.isWholeNumber }) else {
-                throw ValidationError.invalidCharacters(element)
+            guard element.value.allSatisfy({ $0.isASCII && $0.isWholeNumber }) else {
+                throw ValidationError.invalidCharacters(element.value)
+            }
+            guard element.value.count <= element.maximumDigitCount else {
+                throw ValidationError.elementTooLong(element.value)
             }
         }
     }
