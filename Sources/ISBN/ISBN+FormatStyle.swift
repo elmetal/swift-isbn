@@ -28,7 +28,6 @@ extension ISBN {
     }
 }
 
-@available(macOS 12.0, *)
 extension FormatStyle where Self == ISBN.FormatStyle {
     /// A format style that renders ISBN values with hyphens.
     public static var isbn: Self { .init() }

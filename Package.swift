@@ -5,6 +5,13 @@ import PackageDescription
 
 let package = Package(
     name: "swift-isbn",
+    // The oldest OS versions that ship Foundation's `FormatStyle`.
+    platforms: [
+        .macOS(.v12),
+        .iOS(.v15),
+        .tvOS(.v15),
+        .watchOS(.v8),
+    ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
