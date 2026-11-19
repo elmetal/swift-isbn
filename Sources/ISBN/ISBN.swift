@@ -29,6 +29,13 @@ public struct ISBN: Equatable, Hashable, Sendable {
     public enum ValidationError: Error, Equatable {
         /// The prefix element is not a valid ISBN-13 prefix.
         case invalidPrefixElement(String)
+        /// The registration group, registrant, or publication element is empty.
+        /// Each of them consists of at least one digit.
+        case emptyElement
+        /// The registration group, registrant, or publication element has more
+        /// digits than an ISBN allows: 5, 7, and 6 respectively. The associated
+        /// value is the offending element.
+        case elementTooLong(String)
         /// The registration group, registrant, or publication element contains
         /// a character other than the ASCII digits 0–9. The associated value is
         /// the offending element.
@@ -97,11 +104,33 @@ public struct ISBN: Equatable, Hashable, Sendable {
 }
 
 extension ISBN {
-    /// Throws ``ValidationError/invalidCharacters(_:)`` for the first of
-    /// `elements` that contains anything other than the ASCII digits 0–9.
-    static func validateDigitsOnly(_ elements: String...) throws {
-        for element in elements where !element.allSatisfy({ $0.isASCII && $0.isWholeNumber }) {
-            throw ValidationError.invalidCharacters(element)
+    /// Validates the registration group, registrant, and publication elements.
+    ///
+    /// Throws ``ValidationError/emptyElement`` for an empty element,
+    /// ``ValidationError/invalidCharacters(_:)`` for one that contains anything
+    /// other than the ASCII digits 0–9, and ``ValidationError/elementTooLong(_:)``
+    /// for one with more digits than an ISBN allows, reporting the first
+    /// problem found.
+    static func validateElements(
+        registrationGroupElement: String,
+        registrantElement: String,
+        publicationElement: String
+    ) throws {
+        let elements = [
+            (value: registrationGroupElement, maximumDigitCount: 5),
+            (value: registrantElement, maximumDigitCount: 7),
+            (value: publicationElement, maximumDigitCount: 6)
+        ]
+        for element in elements {
+            guard !element.value.isEmpty else {
+                throw ValidationError.emptyElement
+            }
+            guard element.value.allSatisfy({ $0.isASCII && $0.isWholeNumber }) else {
+                throw ValidationError.invalidCharacters(element.value)
+            }
+            guard element.value.count <= element.maximumDigitCount else {
+                throw ValidationError.elementTooLong(element.value)
+            }
         }
     }
 }

@@ -25,10 +25,10 @@ struct ISBN10 {
             throw ISBN.ValidationError.invalidCheckDigit(checkDigit)
         }
 
-        try ISBN.validateDigitsOnly(
-            registrationGroupElement,
-            registrantElement,
-            publicationElement
+        try ISBN.validateElements(
+            registrationGroupElement: registrationGroupElement,
+            registrantElement: registrantElement,
+            publicationElement: publicationElement
         )
 
         let totalDigitCount = registrationGroupElement.count

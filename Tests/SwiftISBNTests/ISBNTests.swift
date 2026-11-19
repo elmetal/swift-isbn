@@ -186,6 +186,138 @@ struct ISBNTests {
         )
     }
 
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13RegistrationGroupElementIsEmpty() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "",
+                registrantElement: "487311",
+                publicationElement: "593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13RegistrantElementIsEmpty() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4873",
+                registrantElement: "",
+                publicationElement: "11593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenISBN10PublicationElementIsEmpty() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "03",
+                registrantElement: "0640615",
+                publicationElement: "",
+                checkDigit: "2"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initReportsEmptyElementBeforeTotalDigitCount() {
+        #expect(throws: ISBN.ValidationError.emptyElement) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "",
+                registrantElement: "87311",
+                publicationElement: "593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenRegistrationGroupElementExceeds5Digits() {
+        #expect(throws: ISBN.ValidationError.elementTooLong("123456")) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "123456",
+                registrantElement: "1",
+                publicationElement: "12",
+                checkDigit: "0"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13PublicationElementExceeds6Digits() {
+        #expect(throws: ISBN.ValidationError.elementTooLong("7311593")) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "8",
+                publicationElement: "7311593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenISBN10PublicationElementExceeds6Digits() {
+        #expect(throws: ISBN.ValidationError.elementTooLong("0640615")) {
+            try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "0",
+                registrantElement: "3",
+                publicationElement: "0640615",
+                checkDigit: "2"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initReportsRegistrantElementExceeding7DigitsBeforeTotalDigitCount() {
+        #expect(throws: ISBN.ValidationError.elementTooLong("87311593")) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "87311593",
+                publicationElement: "1",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation))
+    func initAcceptsElementsAtMaximumLength() throws {
+        // 5-digit registration group element.
+        _ = try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "99921",
+            registrantElement: "58",
+            publicationElement: "10",
+            checkDigit: "7"
+        )
+        // 7-digit registrant element.
+        _ = try ISBN(
+            prefixElement: "978",
+            registrationGroupElement: "1",
+            registrantElement: "9160000",
+            publicationElement: "0",
+            checkDigit: "1"
+        )
+        // 6-digit publication element.
+        _ = try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "0",
+            registrantElement: "00",
+            publicationElement: "123456",
+            checkDigit: "0"
+        )
+    }
+
     @Test
     func isbnsWithSameElementsAreEqualAndHashEqually() throws {
         let lhs = try Self.makeISBN13()
