@@ -59,7 +59,8 @@ struct ISBN10 {
         var sum = 0
         let weights = stride(from: 10, through: 2, by: -1)
         for (weight, character) in zip(weights, digitsWithoutCheckDigit) {
-            guard let digit = character.wholeNumberValue else {
+            // `wholeNumberValue` alone also accepts non-ASCII digits such as "４".
+            guard character.isASCII, let digit = character.wholeNumberValue else {
                 return nil
             }
             sum += digit * weight
