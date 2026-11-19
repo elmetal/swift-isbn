@@ -99,7 +99,7 @@ struct ISBNTests {
 
     @Test(.tags(.validation, .isbn13))
     func initThrowsWhenISBN13ContainsNonASCIIDigit() {
-        #expect(throws: ISBN.ValidationError.self) {
+        #expect(throws: ISBN.ValidationError.invalidCharacters("４")) {
             try ISBN(
                 prefixElement: "978",
                 registrationGroupElement: "４",
@@ -112,7 +112,7 @@ struct ISBNTests {
 
     @Test(.tags(.validation, .isbn10))
     func initThrowsWhenISBN10ContainsNonASCIIDigit() {
-        #expect(throws: ISBN.ValidationError.self) {
+        #expect(throws: ISBN.ValidationError.invalidCharacters("０")) {
             try ISBN(
                 prefixElement: "",
                 registrationGroupElement: "０",
@@ -121,6 +121,69 @@ struct ISBNTests {
                 checkDigit: "2"
             )
         }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13ElementContainsNonDigit() {
+        #expect(throws: ISBN.ValidationError.invalidCharacters("8731A")) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "8731A",
+                publicationElement: "593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenISBN10ElementContainsNonDigit() {
+        #expect(throws: ISBN.ValidationError.invalidCharacters("4061X")) {
+            try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "0",
+                registrantElement: "306",
+                publicationElement: "4061X",
+                checkDigit: "2"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initReportsNonDigitBeforeTotalDigitCount() {
+        #expect(throws: ISBN.ValidationError.invalidCharacters("873-11")) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "873-11",
+                publicationElement: "593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsInvalidCheckDigitWhenCheckDigitIsNotDigit() {
+        #expect(throws: ISBN.ValidationError.invalidCheckDigit("A")) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "87311",
+                publicationElement: "593",
+                checkDigit: "A"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initAcceptsISBN10WithCheckDigitX() throws {
+        _ = try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "0",
+            registrantElement: "8044",
+            publicationElement: "2957",
+            checkDigit: "X"
+        )
     }
 
     @Test
