@@ -6,82 +6,21 @@
 //
 //
 
-struct ISBN13 {
-    let prefixElement: String
-    let registrationGroupElement: String
-    let registrantElement: String
-    let publicationElement: String
-    let checkDigit: String
+extension ISBN {
+    static let validPrefixElements: Set<String> = ["978", "979"]
 
-    private static let validPrefixElements: Set<String> = ["978", "979"]
-    private static let expectedTotalDigitCount = 13
-
-    init(
-        prefixElement: String,
-        registrationGroupElement: String,
-        registrantElement: String,
-        publicationElement: String,
-        checkDigit: String
-    ) throws {
-        guard Self.validPrefixElements.contains(prefixElement) else {
-            throw ISBN.ValidationError.invalidPrefixElement(prefixElement)
-        }
-
-        guard checkDigit.count == 1 else {
-            throw ISBN.ValidationError.invalidCheckDigit(checkDigit)
-        }
-
-        try ISBN.validateElements(
-            registrationGroupElement: registrationGroupElement,
-            registrantElement: registrantElement,
-            publicationElement: publicationElement
-        )
-
-        let totalDigitCount = prefixElement.count
-            + registrationGroupElement.count
-            + registrantElement.count
-            + publicationElement.count
-            + checkDigit.count
-        guard totalDigitCount == Self.expectedTotalDigitCount else {
-            throw ISBN.ValidationError.invalidTotalDigitCount(totalDigitCount)
-        }
-
-        let digitsWithoutCheckDigit = prefixElement
-            + registrationGroupElement
-            + registrantElement
-            + publicationElement
-        guard let expectedCheckDigit = Self.expectedCheckDigit(for: digitsWithoutCheckDigit) else {
-            throw ISBN.ValidationError.invalidCheckDigit(checkDigit)
-        }
-
-        guard checkDigit == expectedCheckDigit else {
-            throw ISBN.ValidationError.invalidCheckDigit(checkDigit)
-        }
-
-        self.prefixElement = prefixElement
-        self.registrationGroupElement = registrationGroupElement
-        self.registrantElement = registrantElement
-        self.publicationElement = publicationElement
-        self.checkDigit = checkDigit
-    }
-
-    static func expectedCheckDigit(for digitsWithoutCheckDigit: String) -> String? {
-        guard digitsWithoutCheckDigit.count == expectedTotalDigitCount - 1 else {
-            return nil
-        }
-
-        var sum = 0
-        for (index, character) in digitsWithoutCheckDigit.enumerated() {
-            // `wholeNumberValue` alone also accepts non-ASCII digits such as "４".
-            guard character.isASCII, let digit = character.wholeNumberValue else {
-                return nil
+    /// Returns the check digit of the 13-digit form for the 12 digits that
+    /// precede it.
+    ///
+    /// - Parameter digits: The prefix, registration group, registrant, and
+    ///   publication elements, already validated to contain only ASCII digits.
+    static func isbn13CheckDigit(for digits: String) -> String {
+        let sum = digits
+            .compactMap(\.wholeNumberValue)
+            .enumerated()
+            .reduce(0) { sum, digit in
+                sum + digit.element * (digit.offset.isMultiple(of: 2) ? 1 : 3)
             }
-
-            let weight = index.isMultiple(of: 2) ? 1 : 3
-            sum += digit * weight
-        }
-
-        let checkDigitValue = (10 - (sum % 10)) % 10
-        return String(checkDigitValue)
+        return String((10 - (sum % 10)) % 10)
     }
 }

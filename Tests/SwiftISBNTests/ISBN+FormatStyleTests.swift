@@ -41,17 +41,54 @@ struct ISBNFormatStyleTests {
     }
 
     @Test
-    func formatStyleOmitsEmptyPrefixElement() throws {
+    func isbnStyleRenders13DigitFormForISBNCreatedFromISBN10() throws {
         let isbn = try ISBN(
-            prefixElement: "",
             registrationGroupElement: "0",
             registrantElement: "306",
             publicationElement: "40615",
-            checkDigit: "2"
+            isbn10CheckDigit: "2"
         )
 
-        let formatted = isbn.formatted(.isbn)
+        #expect(isbn.formatted(.isbn) == "978-0-306-40615-7")
+    }
+
+    @Test
+    func isbn10StyleRendersISBNCreatedFromISBN10() throws {
+        let isbn = try ISBN(
+            registrationGroupElement: "0",
+            registrantElement: "306",
+            publicationElement: "40615",
+            isbn10CheckDigit: "2"
+        )
+
+        let formatted: String? = isbn.formatted(.isbn10)
 
         #expect(formatted == "0-306-40615-2")
+    }
+
+    @Test
+    func isbn10StyleRecalculatesCheckDigitForISBNCreatedFrom13DigitForm() throws {
+        let isbn = try ISBN(
+            prefixElement: "978",
+            registrationGroupElement: "4",
+            registrantElement: "87311",
+            publicationElement: "593",
+            checkDigit: "1"
+        )
+
+        #expect(isbn.formatted(.isbn10) == "4-87311-593-0")
+    }
+
+    @Test
+    func isbn10StyleReturnsNilForPrefixElement979() throws {
+        let isbn = try ISBN(
+            prefixElement: "979",
+            registrationGroupElement: "10",
+            registrantElement: "1234",
+            publicationElement: "567",
+            checkDigit: "8"
+        )
+
+        #expect(isbn.formatted(.isbn10) == nil)
     }
 }
