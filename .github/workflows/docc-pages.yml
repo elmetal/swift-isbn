@@ -32,7 +32,7 @@ jobs:
           $(xcrun --find docc) process-archive \
              transform-for-static-hosting DerivedData/Build/Products/Debug-*/ISBN.doccarchive \
              --output-path ./docs \
-             --hosting-base-path "ISBN"
+             --hosting-base-path "${{ github.event.repository.name }}"
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
