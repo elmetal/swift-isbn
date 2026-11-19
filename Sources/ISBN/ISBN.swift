@@ -9,16 +9,16 @@
 /// A value that represents a validated ISBN-10 or ISBN-13.
 ///
 /// Create an ``ISBN`` by providing each element of the ISBN. The initializer
-/// validates the digits and check digit, then normalizes the stored elements
-/// based on whether the value is ISBN-10 or ISBN-13.
+/// validates the digits and check digit as ISBN-10 when the prefix element is
+/// empty, and as ISBN-13 otherwise.
 ///
 /// ```swift
 /// let isbn = try ISBN(
 ///     prefixElement: "978",
 ///     registrationGroupElement: "4",
-///     registrantElement: "1234",
-///     publicationElement: "5678",
-///     checkDigit: "9"
+///     registrantElement: "87311",
+///     publicationElement: "593",
+///     checkDigit: "1"
 /// )
 /// ```
 public struct ISBN {
