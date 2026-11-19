@@ -87,14 +87,65 @@ struct ISBNTests {
     }
 
     @Test(.tags(.validation, .isbn10))
-    func initAcceptsISBN10WhenPrefixElementIsEmpty() throws {
-        _ = try ISBN(
-            prefixElement: "",
+    func initFromISBN10StoresThe13DigitForm() throws {
+        let isbn = try Self.makeISBN10()
+
+        #expect(isbn.prefixElement == "978")
+        #expect(isbn.registrationGroupElement == "0")
+        #expect(isbn.registrantElement == "306")
+        #expect(isbn.publicationElement == "40615")
+        #expect(isbn.checkDigit == "7")
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func isbnCreatedFromISBN10EqualsThe13DigitForm() throws {
+        let fromISBN10 = try Self.makeISBN10()
+        let fromISBN13 = try ISBN(
+            prefixElement: "978",
             registrationGroupElement: "0",
             registrantElement: "306",
             publicationElement: "40615",
-            checkDigit: "2"
+            checkDigit: "7"
         )
+
+        #expect(fromISBN10 == fromISBN13)
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenISBN10CheckDigitDoesNotMatchRule() {
+        #expect(throws: ISBN.ValidationError.invalidCheckDigit("3")) {
+            try ISBN(
+                registrationGroupElement: "0",
+                registrantElement: "306",
+                publicationElement: "40615",
+                isbn10CheckDigit: "3"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenISBN10TotalDigitCountIsNot10() {
+        #expect(throws: ISBN.ValidationError.invalidTotalDigitCount(9)) {
+            try ISBN(
+                registrationGroupElement: "0",
+                registrantElement: "306",
+                publicationElement: "4061",
+                isbn10CheckDigit: "2"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenPrefixElementIsEmpty() {
+        #expect(throws: ISBN.ValidationError.invalidPrefixElement("")) {
+            try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "0",
+                registrantElement: "306",
+                publicationElement: "40615",
+                checkDigit: "2"
+            )
+        }
     }
 
     @Test(.tags(.validation, .isbn13))
@@ -114,11 +165,10 @@ struct ISBNTests {
     func initThrowsWhenISBN10ContainsNonASCIIDigit() {
         #expect(throws: ISBN.ValidationError.invalidCharacters("０")) {
             try ISBN(
-                prefixElement: "",
                 registrationGroupElement: "０",
                 registrantElement: "306",
                 publicationElement: "40615",
-                checkDigit: "2"
+                isbn10CheckDigit: "2"
             )
         }
     }
@@ -140,11 +190,10 @@ struct ISBNTests {
     func initThrowsWhenISBN10ElementContainsNonDigit() {
         #expect(throws: ISBN.ValidationError.invalidCharacters("4061X")) {
             try ISBN(
-                prefixElement: "",
                 registrationGroupElement: "0",
                 registrantElement: "306",
                 publicationElement: "4061X",
-                checkDigit: "2"
+                isbn10CheckDigit: "2"
             )
         }
     }
@@ -178,45 +227,41 @@ struct ISBNTests {
     @Test(.tags(.validation, .isbn10))
     func initAcceptsISBN10WithCheckDigitX() throws {
         _ = try ISBN(
-            prefixElement: "",
             registrationGroupElement: "0",
             registrantElement: "8044",
             publicationElement: "2957",
-            checkDigit: "X"
+            isbn10CheckDigit: "X"
         )
     }
 
     @Test(.tags(.validation, .isbn10))
     func initNormalizesLowercaseXCheckDigitForISBN10() throws {
         let lowercase = try ISBN(
-            prefixElement: "",
             registrationGroupElement: "0",
             registrantElement: "8044",
             publicationElement: "2957",
-            checkDigit: "x"
+            isbn10CheckDigit: "x"
         )
         let uppercase = try ISBN(
-            prefixElement: "",
             registrationGroupElement: "0",
             registrantElement: "8044",
             publicationElement: "2957",
-            checkDigit: "X"
+            isbn10CheckDigit: "X"
         )
 
-        #expect(lowercase.checkDigit == "X")
         #expect(lowercase == uppercase)
-        #expect(lowercase.formatted(.isbn) == "0-8044-2957-X")
+        #expect(lowercase.formatted(.isbn10) == "0-8044-2957-X")
+        #expect(lowercase.formatted(.isbn) == "978-0-8044-2957-3")
     }
 
     @Test(.tags(.validation, .isbn10))
     func initThrowsWhenLowercaseXIsNotTheExpectedISBN10CheckDigit() {
         #expect(throws: ISBN.ValidationError.invalidCheckDigit("x")) {
             try ISBN(
-                prefixElement: "",
                 registrationGroupElement: "0",
                 registrantElement: "306",
                 publicationElement: "40615",
-                checkDigit: "x"
+                isbn10CheckDigit: "x"
             )
         }
     }
@@ -264,11 +309,10 @@ struct ISBNTests {
     func initThrowsWhenISBN10PublicationElementIsEmpty() {
         #expect(throws: ISBN.ValidationError.emptyElement) {
             try ISBN(
-                prefixElement: "",
                 registrationGroupElement: "03",
                 registrantElement: "0640615",
                 publicationElement: "",
-                checkDigit: "2"
+                isbn10CheckDigit: "2"
             )
         }
     }
@@ -316,11 +360,10 @@ struct ISBNTests {
     func initThrowsWhenISBN10PublicationElementExceeds6Digits() {
         #expect(throws: ISBN.ValidationError.elementTooLong("0640615")) {
             try ISBN(
-                prefixElement: "",
                 registrationGroupElement: "0",
                 registrantElement: "3",
                 publicationElement: "0640615",
-                checkDigit: "2"
+                isbn10CheckDigit: "2"
             )
         }
     }
@@ -342,11 +385,10 @@ struct ISBNTests {
     func initAcceptsElementsAtMaximumLength() throws {
         // 5-digit registration group element.
         _ = try ISBN(
-            prefixElement: "",
             registrationGroupElement: "99921",
             registrantElement: "58",
             publicationElement: "10",
-            checkDigit: "7"
+            isbn10CheckDigit: "7"
         )
         // 7-digit registrant element.
         _ = try ISBN(
@@ -358,11 +400,10 @@ struct ISBNTests {
         )
         // 6-digit publication element.
         _ = try ISBN(
-            prefixElement: "",
             registrationGroupElement: "0",
             registrantElement: "00",
             publicationElement: "123456",
-            checkDigit: "0"
+            isbn10CheckDigit: "0"
         )
     }
 
@@ -414,11 +455,10 @@ struct ISBNTests {
 
     private static func makeISBN10() throws -> ISBN {
         try ISBN(
-            prefixElement: "",
             registrationGroupElement: "0",
             registrantElement: "306",
             publicationElement: "40615",
-            checkDigit: "2"
+            isbn10CheckDigit: "2"
         )
     }
 }
