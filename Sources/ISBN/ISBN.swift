@@ -29,6 +29,10 @@ public struct ISBN: Equatable, Hashable, Sendable {
     public enum ValidationError: Error, Equatable {
         /// The prefix element is not a valid ISBN-13 prefix.
         case invalidPrefixElement(String)
+        /// The registration group, registrant, or publication element contains
+        /// a character other than the ASCII digits 0–9. The associated value is
+        /// the offending element.
+        case invalidCharacters(String)
         /// The overall digit count does not match ISBN-10 or ISBN-13.
         case invalidTotalDigitCount(Int)
         /// The check digit is invalid for the provided digits.
@@ -88,6 +92,16 @@ public struct ISBN: Equatable, Hashable, Sendable {
             self.registrantElement = isbn13.registrantElement
             self.publicationElement = isbn13.publicationElement
             self.checkDigit = isbn13.checkDigit
+        }
+    }
+}
+
+extension ISBN {
+    /// Throws ``ValidationError/invalidCharacters(_:)`` for the first of
+    /// `elements` that contains anything other than the ASCII digits 0–9.
+    static func validateDigitsOnly(_ elements: String...) throws {
+        for element in elements where !element.allSatisfy({ $0.isASCII && $0.isWholeNumber }) {
+            throw ValidationError.invalidCharacters(element)
         }
     }
 }
