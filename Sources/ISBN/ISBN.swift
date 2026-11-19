@@ -26,9 +26,11 @@
 /// ``init(registrationGroupElement:registrantElement:publicationElement:isbn10CheckDigit:)``
 /// and write one out with the `isbn10` format style.
 ///
-/// Two ``ISBN`` values are equal when all of their elements are equal. An ISBN
-/// created from its 10-digit form is therefore equal to the same ISBN created
-/// from its 13-digit form.
+/// Two ``ISBN`` values are equal when their 13 digits are equal. Hyphens carry
+/// no meaning in an ISBN, so values that divide the same digits into elements
+/// differently are equal, even though their elements and formatted output
+/// differ. An ISBN created from its 10-digit form is equal to the same ISBN
+/// created from its 13-digit form.
 public struct ISBN: Equatable, Hashable, Sendable {
     /// Validation failures that can occur while initializing an ``ISBN``.
     public enum ValidationError: Error, Equatable {
@@ -104,6 +106,26 @@ public struct ISBN: Equatable, Hashable, Sendable {
         self.registrantElement = registrantElement
         self.publicationElement = publicationElement
         self.checkDigit = checkDigit
+    }
+}
+
+extension ISBN {
+    /// The 13 digits of the ISBN without separators. This is the identity of
+    /// the value: equality and hashing use nothing else.
+    var digits: String {
+        prefixElement
+            + registrationGroupElement
+            + registrantElement
+            + publicationElement
+            + checkDigit
+    }
+
+    public static func == (lhs: ISBN, rhs: ISBN) -> Bool {
+        lhs.digits == rhs.digits
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(digits)
     }
 }
 

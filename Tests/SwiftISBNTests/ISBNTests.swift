@@ -425,6 +425,25 @@ struct ISBNTests {
     }
 
     @Test
+    func isbnsWithSameDigitsAreEqualRegardlessOfElementBoundaries() throws {
+        let lhs = try Self.makeISBN13()
+        let rhs = try ISBN(
+            prefixElement: "978",
+            registrationGroupElement: "48",
+            registrantElement: "7311",
+            publicationElement: "593",
+            checkDigit: "1"
+        )
+
+        #expect(lhs == rhs)
+        #expect(lhs.hashValue == rhs.hashValue)
+        #expect(Set([lhs, rhs]).count == 1)
+        // Each value still keeps the element boundaries it was created with.
+        #expect(lhs.formatted(.isbn) == "978-4-87311-593-1")
+        #expect(rhs.formatted(.isbn) == "978-48-7311-593-1")
+    }
+
+    @Test
     func isbnCanBeUsedAsSetElement() throws {
         let isbns: Set<ISBN> = [
             try Self.makeISBN13(),
