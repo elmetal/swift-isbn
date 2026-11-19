@@ -96,4 +96,30 @@ struct ISBNTests {
             checkDigit: "2"
         )
     }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13ContainsNonASCIIDigit() {
+        #expect(throws: ISBN.ValidationError.self) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "４",
+                registrantElement: "87311",
+                publicationElement: "593",
+                checkDigit: "1"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenISBN10ContainsNonASCIIDigit() {
+        #expect(throws: ISBN.ValidationError.self) {
+            try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "０",
+                registrantElement: "306",
+                publicationElement: "40615",
+                checkDigit: "2"
+            )
+        }
+    }
 }

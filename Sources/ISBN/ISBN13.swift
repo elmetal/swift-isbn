@@ -66,7 +66,8 @@ struct ISBN13 {
 
         var sum = 0
         for (index, character) in digitsWithoutCheckDigit.enumerated() {
-            guard let digit = character.wholeNumberValue else {
+            // `wholeNumberValue` alone also accepts non-ASCII digits such as "４".
+            guard character.isASCII, let digit = character.wholeNumberValue else {
                 return nil
             }
 
