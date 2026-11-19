@@ -186,6 +186,54 @@ struct ISBNTests {
         )
     }
 
+    @Test(.tags(.validation, .isbn10))
+    func initNormalizesLowercaseXCheckDigitForISBN10() throws {
+        let lowercase = try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "0",
+            registrantElement: "8044",
+            publicationElement: "2957",
+            checkDigit: "x"
+        )
+        let uppercase = try ISBN(
+            prefixElement: "",
+            registrationGroupElement: "0",
+            registrantElement: "8044",
+            publicationElement: "2957",
+            checkDigit: "X"
+        )
+
+        #expect(lowercase.checkDigit == "X")
+        #expect(lowercase == uppercase)
+        #expect(lowercase.formatted(.isbn) == "0-8044-2957-X")
+    }
+
+    @Test(.tags(.validation, .isbn10))
+    func initThrowsWhenLowercaseXIsNotTheExpectedISBN10CheckDigit() {
+        #expect(throws: ISBN.ValidationError.invalidCheckDigit("x")) {
+            try ISBN(
+                prefixElement: "",
+                registrationGroupElement: "0",
+                registrantElement: "306",
+                publicationElement: "40615",
+                checkDigit: "x"
+            )
+        }
+    }
+
+    @Test(.tags(.validation, .isbn13))
+    func initThrowsWhenISBN13CheckDigitIsLowercaseX() {
+        #expect(throws: ISBN.ValidationError.invalidCheckDigit("x")) {
+            try ISBN(
+                prefixElement: "978",
+                registrationGroupElement: "4",
+                registrantElement: "87311",
+                publicationElement: "593",
+                checkDigit: "x"
+            )
+        }
+    }
+
     @Test(.tags(.validation, .isbn13))
     func initThrowsWhenISBN13RegistrationGroupElementIsEmpty() {
         #expect(throws: ISBN.ValidationError.emptyElement) {

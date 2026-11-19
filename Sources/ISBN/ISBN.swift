@@ -54,7 +54,7 @@ public struct ISBN: Equatable, Hashable, Sendable {
     public let registrantElement: String
     /// The publication element.
     public let publicationElement: String
-    /// The check digit.
+    /// The check digit. For ISBN-10 this is a digit or an uppercase "X".
     public let checkDigit: String
 
     /// Creates a validated ISBN value from its components.
@@ -64,7 +64,8 @@ public struct ISBN: Equatable, Hashable, Sendable {
     ///   - registrationGroupElement: The registration group element.
     ///   - registrantElement: The registrant element.
     ///   - publicationElement: The publication element.
-    ///   - checkDigit: The check digit.
+    ///   - checkDigit: The check digit. For ISBN-10, a lowercase "x" is accepted
+    ///     and stored as "X".
     /// - Throws: ``ISBN/ValidationError`` when the digits are invalid or the
     ///   check digit does not match.
     public init(

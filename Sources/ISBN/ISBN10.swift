@@ -46,7 +46,9 @@ struct ISBN10 {
             throw ISBN.ValidationError.invalidCheckDigit(checkDigit)
         }
 
-        guard checkDigit == expectedCheckDigit else {
+        // A lowercase "x" is accepted as input and stored in its standard form "X".
+        let normalizedCheckDigit = checkDigit == "x" ? "X" : checkDigit
+        guard normalizedCheckDigit == expectedCheckDigit else {
             throw ISBN.ValidationError.invalidCheckDigit(checkDigit)
         }
 
@@ -54,7 +56,7 @@ struct ISBN10 {
         self.registrationGroupElement = registrationGroupElement
         self.registrantElement = registrantElement
         self.publicationElement = publicationElement
-        self.checkDigit = checkDigit
+        self.checkDigit = normalizedCheckDigit
     }
 
     static func expectedCheckDigit(for digitsWithoutCheckDigit: String) -> String? {
